@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:reorderables/reorderables.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,39 +26,39 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<Widget> _rows;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _rows = List<Widget>.generate(50,
+            (int index) => Text('This is row $index', key: ValueKey(index), textScaleFactor: 1.5)
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+
+    void _onReorder(int oldIndex, int newIndex) {
+      setState(() {
+        Widget row = _rows.removeAt(oldIndex);
+        _rows.insert(newIndex, row);
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+        child: ReorderableColumn(
+          header: Text('THIS IS THE HEADER ROW'),
+          footer: Text('THIS IS THE FOOTER ROW'),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _rows,
+          onReorder: _onReorder,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
